@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  romvault:
+    image: romvault:latest
+    container_name: romvault
+    volumes:
+      ## Specific container volumes
+    tmpfs:
+      - /config/cache
+    ports:
+      - 5800:5800
+      - 5900:5900
+    environment:
+      - USER_ID=1028
+      - GROUP_ID=100
+      - DISPLAY_WIDTH=1920
+      - DISPLAY_HEIGHT=1080      
+      - APP_NAME=RomVault
+      - KEEP_APP_RUNNING=1
