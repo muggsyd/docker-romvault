@@ -1,6 +1,6 @@
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.15-glibc-v3
-
+#FROM jlesage/baseimage-gui:debian-10-v4
+FROM jlesage/baseimage-gui:debian-11-v4
 # environment settings
 ENV PYTHONIOENCODING=utf-8
 ENV APPNAME="ROMVault" UMASK_SET="022"
@@ -8,15 +8,12 @@ ENV APPNAME="ROMVault" UMASK_SET="022"
 ARG ROMVAULT_VERSION
 ARG UID
 
-RUN apk update --no-cache && apk upgrade --no-cache && \
-    apk add gtk+2.0 binutils unzip curl bash fontconfig --no-cache && \
-    apk add mono --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing --no-cache && \
-    apk add libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing  --no-cache
-
-RUN ln -s /usr/lib/libfontconfig.so.1 /usr/lib/libfontconfig.so && \
-    ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so.1 && \
-    ln -s /lib/libc.musl-x86_64.so.1 /usr/lib/libc.musl-x86_64.so.1
-ENV LD_LIBRARY_PATH /usr/lib
+RUN apt update -y
+RUN add-pkg --virtual apt-transport-https dirmngr gnupg ca-certificates curl coreutils unzip libgtk2.0-0
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+RUN echo "deb https://download.mono-project.com/repo/debian stable-buster main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+RUN apt update -y
+RUN apt install mono-xsp4 -y
 
 RUN useradd -m -u $UID -g users -s /bin/bash romvault
 
@@ -49,7 +46,9 @@ RUN FILTER='head -1' && \
     chown romvault /opt/romvault -R && chgrp users /opt/romvault -R && \
     chmod -R +x /opt/romvault
 
-RUN sed-patch 's/<application type="normal">/<application type="normal" title="RomVault ($ROMVAULT_VERSION) \/romvault">/' /etc/xdg/openbox/rc.xml
-RUN sed-patch 's/<decor>no<\/decor>/<decor>yes<\/decor>/' /etc/xdg/openbox/rc.xml
+RUN sed-patch 's/<decor>no<\/decor>/<decor>yes<\/decor>/' /opt/base/etc/openbox/rc.xml.template
+RUN sed-patch 's/<maximized>true<\/maximized>/<maximized>false<\/maximized>/' /opt/base/etc/openbox/rc.xml.template
+
 # Copy the start script.
+COPY files/graphics.zip /opt/romvault
 COPY startapp.sh /startapp.sh
