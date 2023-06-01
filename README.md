@@ -1,6 +1,6 @@
 # docker-romvault
 
-Very poor attempt at building a docker image for Romvault. The user id referneces are in relation to my external volumes that are in use for my rom folder structure
+Very poor attempt at building a docker image for Romvault. The user id references are in relation to my external volumes that are in use for my rom folder structure
 
 It uses the excellent docker image from jlesage as the base
 https://github.com/jlesage/docker-baseimage-gui 
